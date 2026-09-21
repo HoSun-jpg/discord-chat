@@ -29,7 +29,10 @@ io.on('connection', (socket) => {
     });
 });
 
-// 3000번 포트로 서버 실행
-server.listen(3000, () => {
-    console.log('🚀 디스코드 서버가 가동되었습니다! http://localhost:3000');
+// 기존: server.listen(3000, () => { ... });
+
+// 변경: 클라우드 포트 환경변수(process.env.PORT)를 우선 사용하도록 수정
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+    console.log(`🚀 디스코드 서버가 가동되었습니다! 포트: ${PORT}`);
 });

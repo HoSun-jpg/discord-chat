@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -6,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Discord Clone</title>
     <!-- wwwroot/css/style.css 불러오기 -->
-    <link rel="stylesheet" href="css/style.css" asp-append-version="true" />
-    <!-- SignalR JS 라이브러리 CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
@@ -90,69 +87,69 @@
         </div>
     </div>
 
-    <!-- SignalR 클라이언트 스크립트 -->
-    <!-- Socket.io 라이브러리 불러오기 (SignalR 대신 사용) -->
-<script src="/socket.io/socket.io.js"></script>
-<script>
-    // 1. 닉네임 설정
-    const username = prompt("사용할 닉네임을 입력하세요:", "유저_" + Math.floor(Math.random() * 1000)) || "익명유저";
-    document.getElementById("displayUsername").innerText = username;
-    
-    const avatarEl = document.getElementById("avatarText");
-    if(avatarEl) avatarEl.innerText = username.substring(0, 1);
-
-    // 2. 소켓 서버 연결
-    const socket = io();
-
-    // 3. 서버에서 메시지를 받았을 때 화면에 추가
-    socket.on("receiveMessage", function (data) {
-        const messagesList = document.getElementById("messagesList");
+    <!-- Socket.io 라이브러리 불러오기 -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // 1. 닉네임 설정
+        const username = prompt("사용할 닉네임을 입력하세요:", "유저_" + Math.floor(Math.random() * 1000)) || "익명유저";
+        document.getElementById("displayUsername").innerText = username;
         
-        const messageElement = document.createElement("div");
-        messageElement.className = "message-item";
-        
-        messageElement.innerHTML = `
-            <div class="msg-avatar">
-                ${escapeHtml(data.user.substring(0, 1))}
-            </div>
-            <div class="msg-content">
-                <div class="msg-header">
-                    <span class="msg-author">${escapeHtml(data.user)}</span>
-                    <span class="msg-time">${data.time}</span>
+        const avatarEl = document.getElementById("avatarText");
+        if(avatarEl) avatarEl.innerText = username.substring(0, 1);
+
+        // 2. 소켓 서버 연결 (자동으로 현재 도메인/URL 에 연결됨)
+        const socket = io();
+
+        // 3. 서버에서 메시지를 받았을 때 화면에 추가
+        socket.on("receiveMessage", function (data) {
+            const messagesList = document.getElementById("messagesList");
+            
+            const messageElement = document.createElement("div");
+            messageElement.className = "message-item";
+            
+            messageElement.innerHTML = `
+                <div class="msg-avatar">
+                    ${escapeHtml(data.user.substring(0, 1))}
                 </div>
-                <div class="msg-text">${escapeHtml(data.message)}</div>
-            </div>
-        `;
-        
-        messagesList.appendChild(messageElement);
-        messagesList.scrollTop = messagesList.scrollHeight;
-    });
+                <div class="msg-content">
+                    <div class="msg-header">
+                        <span class="msg-author">${escapeHtml(data.user)}</span>
+                        <span class="msg-time">${data.time}</span>
+                    </div>
+                    <div class="msg-text">${escapeHtml(data.message)}</div>
+                </div>
+            `;
+            
+            messagesList.appendChild(messageElement);
+            messagesList.scrollTop = messagesList.scrollHeight;
+        });
 
-    function sendMessage() {
-        const messageInput = document.getElementById("messageInput");
-        const message = messageInput.value.trim();
-        
-        if (message !== "") {
-            socket.emit("sendMessage", {
-                user: username,
-                message: message
-            });
-            messageInput.value = "";
+        function sendMessage() {
+            const messageInput = document.getElementById("messageInput");
+            const message = messageInput.value.trim();
+            
+            if (message !== "") {
+                socket.emit("sendMessage", {
+                    user: username,
+                    message: message
+                });
+                messageInput.value = "";
+            }
         }
-    }
 
-    document.getElementById("sendButton").addEventListener("click", sendMessage);
-    document.getElementById("messageInput").addEventListener("keydown", function (e) {
-        if (e.key === "Enter") {
-            sendMessage();
+        document.getElementById("sendButton").addEventListener("click", sendMessage);
+        document.getElementById("messageInput").addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+                sendMessage();
+            }
+        });
+
+        function escapeHtml(text) {
+            if(!text) return "";
+            const div = document.createElement('div');
+            div.innerText = text;
+            return div.innerHTML;
         }
-    });
-
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.innerText = text;
-        return div.innerHTML;
-    }
-</script>
+    </script>
 </body>
 </html>
